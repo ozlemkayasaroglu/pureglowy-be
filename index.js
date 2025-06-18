@@ -5,7 +5,17 @@ const cors = require("cors");
 const subscribeRoute = require("./routes/subscribe");
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://pureglowy.com",
+    "https://pureglowy-be.vercel.app"
+  ],
+  methods: ["POST", "OPTIONS"],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/subscribe", subscribeRoute);
