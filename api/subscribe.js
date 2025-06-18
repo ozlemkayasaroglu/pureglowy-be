@@ -1,4 +1,4 @@
-const { createClient } = require("@supabase/supabase-js");
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -21,7 +21,7 @@ function setCorsHeaders(req, res) {
   );
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   setCorsHeaders(req, res);
 
   if (req.method === "OPTIONS") {
@@ -65,4 +65,4 @@ module.exports = async (req, res) => {
   }
 
   res.status(200).json({ message: "Subscribed successfully", data });
-}; 
+} 
