@@ -5,12 +5,24 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-module.exports = async (req, res) => {
-  // CORS headers
+function setCorsHeaders(req, res) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    req.headers.origin || "http://localhost:5173"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST,OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Accept"
+  );
+}
+
+module.exports = async (req, res) => {
+  setCorsHeaders(req, res);
 
   if (req.method === "OPTIONS") {
     res.status(200).end();
@@ -22,7 +34,18 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { email } = req.body || {};
+  // Vercel sunucusunda req.body bazen otomatik parse edilmez, JSON parse etmeyi dene
+  let body = req.body;
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      res.status(400).json({ error: "Invalid JSON" });
+      return;
+    }
+  }
+
+  const { email } = body || {};
   if (!email) {
     res.status(400).json({ error: "Email is required" });
     return;
